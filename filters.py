@@ -1,15 +1,23 @@
 import re
 
-def apply_filters(cv_content, experience_years):
+def apply_filters(file_content, minimum_experience_years):
 
-    cv_content_lower = cv_content.lower()
+    file_content_lower = file_content.lower()
 
     approved = True
 
     feedback = []
 
-    for years in cv_content_lower:
+    pattern = rf"{re.escape(file_content_lower)}\s*(\d+(?:[.,]\d+)?)"
 
-        if 
+    match = re.search(pattern, file_content_lower)
 
-    return ""
+    if match:
+        raw_value = match.group(1).replace(',', '.')
+        return float(raw_value) if '.' in raw_value else int(raw_value)
+
+    if raw_value < minimum_experience_years:
+        approved = False
+        feedback.append(f"More experience required: {raw_value} < {minimum_experience_years}")
+
+    return approved, feedback
