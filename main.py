@@ -1,8 +1,8 @@
-from pdf_reader import read_pdf_content
+from src.pdf_reader import read_pdf_content
 
 def execute():
 
-    
+
 
 
 
