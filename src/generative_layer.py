@@ -1,6 +1,6 @@
-from token_tracker import count_tokens
+from src.token_tracker import count_tokens
 
-def candidate_profiler(file_content, y):
+def candidate_profiler(file_content):
 
     model = "gpt-4o-mini-sim"
 
@@ -36,12 +36,13 @@ def candidate_profiler(file_content, y):
     )
     response_tokens = count_tokens(response, model)
 
-    tokens_total = prompt_tokens + response_tokens
+    token_total = prompt_tokens + response_tokens
 
-    tokens_report = {
+    token_report = {
         "model": model,
         "prompt_tokens": prompt_tokens,
-        "tokens_total": tokens_total
+        "response_tokens": response_tokens,
+        "token_total": token_total
     }
 
-    return ""
+    return response, token_report
