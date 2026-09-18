@@ -1,14 +1,13 @@
 import tiktoken
 
-def count_tokens(content, model="gpt-6-astra-sim"):
 
-    try:
-        encoder = tiktoken.encoding_for_model(model)
+def count_tokens(content, model="gpt-4o-mini"):
+    """Conta os tokens do texto usando o tokenizador do modelo."""
+    encoder = tiktoken.encoding_for_model(model)
 
-        tokens = encoder.encode(content)
+    tokens = encoder.encode(
+        content,
+        disallowed_special=(),
+    )
 
-        return len(tokens)
-
-    except Exception as e:
-        print(f"Warning: Failed to count tokens ({e}). Falling back to estimate.")
-        return len(content) // 4
+    return len(tokens)

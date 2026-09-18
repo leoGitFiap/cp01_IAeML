@@ -1,6 +1,7 @@
 from src.pdf_reader import read_file_content
 from src.deterministic_layer import apply_filters
 from src.generative_layer import candidate_profiler
+from pathlib import Path
 
 def run_resume_pipeline():
 
@@ -9,7 +10,11 @@ def run_resume_pipeline():
     budget = 35000
     required_experience = 10
 
-    file_path = "data\curriculo_candidato.pdf"
+    file_path = (
+        Path(__file__).resolve().parent
+        / "data"
+        / "curriculo_candidato.pdf"
+    )
 
     print(f"\nReading file: {file_path}...")
 

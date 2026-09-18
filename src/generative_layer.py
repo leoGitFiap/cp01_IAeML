@@ -189,13 +189,13 @@ def simulate_completion(text):
 
 
 def candidate_profiler(file_content):
-    """Retorna o parecer personalizado e o relatório de tokens."""
+    """Retorna análise simulada, tokens e estimativa de custo."""
     if not isinstance(file_content, str) or not file_content.strip():
         raise ValueError(
             "O currículo precisa conter texto para análise."
         )
 
-    model = "gpt-6-astra-sim"
+    model = "gpt-4o-mini"
 
     system_prompt = (
         "Você é um assistente de triagem de currículos de tecnologia. "
@@ -210,25 +210,28 @@ def candidate_profiler(file_content):
         + file_content
     )
 
+    # A resposta continua sendo gerada pela simulação local.
     completion = simulate_completion(file_content)
 
-    prompt_tokens = count_tokens(prompt, "gpt-6-astra-sim")
-    completion_tokens = count_tokens(completion, "gpt-6-astra-sim")
+    prompt_tokens = count_tokens(prompt, model)
+    completion_tokens = count_tokens(completion, model)
 
     token_total = prompt_tokens + completion_tokens
 
-    prompt_token_rate = 10
-    completion_token_rate = 50
+    prompt_token_rate = 0.15
+    completion_token_rate = 0.60
 
-    cost = (((prompt_tokens * prompt_token_rate) + (completion_tokens * completion_token_rate)) / 1_000_000)
-    clean_cost = f"US$ {cost:.6f}"
+    cost = (
+        (prompt_tokens * prompt_token_rate)
+        + (completion_tokens * completion_token_rate)
+    ) / 1_000_000
 
     token_report = {
         "model": model,
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "token_total": token_total,
-        "cost": clean_cost
+        "cost": f"US$ {cost:.6f}",
     }
 
     return completion, token_report
