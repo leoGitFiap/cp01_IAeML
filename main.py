@@ -4,18 +4,18 @@ from src.generative_layer import candidate_profiler
 
 def run_resume_pipeline():
 
-    print("=== CURRICULUM VITAE PROFILER ===")
+    print("\n=== CURRICULUM VITAE PROFILER ===")
 
     budget = 35000
     required_experience = 10
 
-    file_path = "cp01\entrega\cp01_IA&ML\data\curriculo_candidato.pdf"
+    file_path = "data\curriculo_candidato.pdf"
 
     print(f"\nReading file: {file_path}...")
 
     file_content = read_file_content(file_path)
 
-    print("\nApplying deterministic layer:")
+    print("\nApplying deterministic layer:\n")
     meets_criteria, feedback = apply_filters(
         file_content,
         required_experience,
@@ -36,21 +36,20 @@ def run_resume_pipeline():
     try:
         custom_interview_guide, token_report = candidate_profiler(file_content)
 
-        # Exibe os resultados da análise generativa
-        print("\n==================================================")
-        print("       ROTEIRO PERSONALIZADO GERADO PELA IA       ")
-        print("==================================================")
+        print("\n" + "=" * 52)
+        print("                  CUSTOM AI GUIDE                   ")
+        print("=" * 52)
         print(custom_interview_guide)
         
-        # Exibe o relatório de consumo computacional
-        print("\n==================================================")
-        print("         RELATÓRIO DE CONSUMO E TOKENS            ")
-        print("==================================================")
+        print("\n" + "=" * 52)
+        print("                 TOKEN USAGE REPORT                 ")
+        print("=" * 52)
         print(f"• Model Used                : {token_report['model']}")
         print(f"• Prompt Tokens             : {token_report['prompt_tokens']}")
-        print(f"• Response Tokens           : {token_report['response_tokens']}")
+        print(f"• Completion Tokens         : {token_report['completion_tokens']}")
         print(f"• Total Token Usage         : {token_report['token_total']}")
-        print("==================================================")
+        print(f"• Total Operation Cost      : {token_report['cost']}")
+        print("=" * 52)
 
     except Exception as e:
             print(f"[CRITICAL] Generative layer execution failed: {e}")
