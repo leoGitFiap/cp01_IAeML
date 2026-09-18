@@ -16,7 +16,7 @@ def gerar_curriculo_exemplo():
     else:
         raiz_projeto = pasta_atual
 
-    pasta_saida = os.path.join(raiz_projeto, "dados")
+    pasta_saida = os.path.join(raiz_projeto, "data")
     nome_arquivo = "curriculo_candidato.pdf"
     
     # Cria a pasta de dados caso ela ainda não exista.
