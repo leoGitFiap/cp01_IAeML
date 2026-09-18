@@ -1,4 +1,5 @@
 import os
+
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
@@ -12,7 +13,7 @@ def generate_pdf():
         project_root = current_dir
 
     output_dir = os.path.join(project_root, "data")
-    file_name = "curriculo_candidato.pdf" # Changed to match your file tree
+    file_name = "curriculo_candidato.pdf"
     
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -31,7 +32,7 @@ def generate_pdf():
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, height - 140, "Dados Objetivos:")
     c.setFont("Helvetica", 11)
-    c.drawString(50, height - 160, "Experiência: 28")
+    c.drawString(50, height - 160, "Experiência: 28 anos")
     c.drawString(50, height - 180, "Pretensão salarial: R$ 32.457")
     
     c.drawString(50, height - 210, "-" * 80)
@@ -41,7 +42,7 @@ def generate_pdf():
     
     text_object = c.beginText(50, height - 265)
     text_object.setFont("Helvetica", 11)
-    text_object.setLeading(15) # Line spacing
+    text_object.setLeading(15)
     
     narrative = (
         "Busco a consolidação da minha trajetória técnica assumindo a vanguarda de uma\n"

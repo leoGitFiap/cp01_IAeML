@@ -30,7 +30,7 @@ def apply_filters(file_content, minimum_experience_years, budget):
         approved = False
         feedback.append(f"More experience required: {extracted_experience} < {minimum_experience_years}\n")
 
-   # Part 2 - Budget
+    # Part 2 - Budget
 
     target_budget_label = "pretensão salarial:"
 
@@ -42,14 +42,22 @@ def apply_filters(file_content, minimum_experience_years, budget):
     budget_match = re.search(budget_pattern, file_content_lower)
 
     if budget_match:
-        clean_value = budget_match.group(1).replace('.', '')
-        expected_salary = int(clean_value)
-        
-        if expected_salary > budget:
+        integer_part = budget_match.group(1).replace(".", "")
+        decimal_part = budget_match.group(2) or "00"
+        expected_salary = Decimal(
+            f"{integer_part}.{decimal_part}"
+        )
+        budget_value = Decimal(str(budget))
+        if expected_salary > budget_value:
             approved = False
-            feedback.append(f"Salary expectations ({expected_salary}) exceed the budget ({budget}).\n")
+            feedback.append(
+                f"Salary expectations ({expected_salary}) "
+                f"exceed the budget ({budget_value}).\n"
+            )
     else:
         approved = False
-        feedback.append("Salary expectation not found in the resume.\n")
+        feedback.append(
+            "Salary expectation not found or invalid in the resume.\n"
+       )
 
     return approved, feedback

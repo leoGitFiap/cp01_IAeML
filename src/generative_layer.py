@@ -7,14 +7,13 @@ def candidate_profiler(file_content):
     system_prompt = (
         "Você é um gerente de RH responsável por analisar candidatos para uma das vagas mais disputadas de sua empresa."
         "Sua missão é encontrar o próximo grande membro da equipe de Engenharia de Software."
+        "Com base nos seus profundos conhecimentos, tanto sobre as necessidades específicas da empresa"
+        "quanto as reais virtudes de um trabalhados experiente no mercado corporativo, analise o seguinte"
+        "currículo e retorne um parecer qualitativo e um resumo executivo sobre o candidato:"
     )
 
     user_prompt = (
         f"""
-        Com base nos seus profundos conhecimentos, tanto sobre as necessidades específicas da empresa
-        quanto as reais virtudes de um trabalhados experiente no mercado corporativo, analise o seguinte
-        currículo e retorne um parecer qualitativo e um resumo executivo sobre o candidato:
-
         --- CURRÍCULO ---
         {file_content}
         """
@@ -42,7 +41,7 @@ def candidate_profiler(file_content):
     completion_token_rate = 0.60
 
     cost = ((prompt_tokens * prompt_token_rate) + (completion_tokens * completion_token_rate) / 1000000)
-    clean_cost = f"U$ {cost:.2f}"
+    clean_cost = f"US$ {cost:.2f}"
 
     token_report = {
         "model": model,
