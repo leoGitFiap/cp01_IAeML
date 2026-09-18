@@ -2,7 +2,7 @@ from src.token_tracker import count_tokens
 
 def candidate_profiler(file_content):
 
-    model = "gpt-4o-mini-sim"
+    model = "gpt-6-astra-sim"
 
     system_prompt = (
         "Você é um gerente de RH responsável por analisar candidatos para uma das vagas mais disputadas de sua empresa."
@@ -37,11 +37,11 @@ def candidate_profiler(file_content):
 
     token_total = prompt_tokens + completion_tokens
 
-    prompt_token_rate = 0.15
-    completion_token_rate = 0.60
+    prompt_token_rate = 10
+    completion_token_rate = 50
 
-    cost = ((prompt_tokens * prompt_token_rate) + (completion_tokens * completion_token_rate) / 1000000)
-    clean_cost = f"US$ {cost:.2f}"
+    cost = (((prompt_tokens * prompt_token_rate) + (completion_tokens * completion_token_rate)) / 1_000_000)
+    clean_cost = f"US$ {cost:.6f}"
 
     token_report = {
         "model": model,

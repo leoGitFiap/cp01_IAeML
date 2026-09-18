@@ -1,6 +1,6 @@
 import tiktoken
 
-def count_tokens(content, model="gpt-4o-mini"):
+def count_tokens(content, model="gpt-6-astra-sim"):
 
     try:
         encoder = tiktoken.encoding_for_model(model)
