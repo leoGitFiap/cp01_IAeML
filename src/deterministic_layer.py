@@ -1,34 +1,39 @@
+"""Valida experiência mínima e pretensão salarial antes da análise simulada."""
+
 import re
 
 from decimal import Decimal
 
-def apply_filters(file_content, minimum_experience_years, budget):
+def aplicar_filtros(texto_curriculo, experiencia_minima_anos, orcamento_vaga):
+    """Retorna a aprovação e os motivos encontrados nos dois filtros."""
 
-    file_content_lower = file_content.lower()
+    # Ignora diferenças entre letras maiúsculas e minúsculas.
+    texto_minusculo = texto_curriculo.lower()
 
-    approved = True
+    aprovado = True
 
-    feedback = []
+    motivos_reprovacao = []
 
-    # Part 1 - Experience
+    # Procura a experiência no campo identificado do currículo.
 
-    experience_field = re.search(
+    campo_experiencia = re.search(
         r"^[ \t]*experi[eê]ncia(?: profissional)?[ \t]*:"
         r"[ \t]*([^\r\n]+)",
-        file_content_lower,
+        texto_minusculo,
         flags=re.MULTILINE,
     )
 
-    if experience_field is None:
-        approved = False
-        feedback.append(
+    if campo_experiencia is None:
+        aprovado = False
+        motivos_reprovacao.append(
             "Informação de experiência não encontrada no currículo.\n"
         )
 
     else:
-        raw_experience = experience_field.group(1).strip()
+        experiencia_informada = campo_experiencia.group(1).strip()
 
-        experience_pattern = (
+        # Aceita um número, uma unidade opcional e o texto "de experiência".
+        padrao_experiencia = (
             r"(\d+(?:[.,]\d+)?)"
             r"\s*"
             r"(anos?|meses|mês|mes)?"
@@ -36,72 +41,78 @@ def apply_filters(file_content, minimum_experience_years, budget):
             r"\.?"
         )
 
-        experience_match = re.fullmatch(
-            experience_pattern,
-            raw_experience,
+        # Valida o campo inteiro para evitar a leitura de valores incompletos.
+        correspondencia_experiencia = re.fullmatch(
+            padrao_experiencia,
+            experiencia_informada,
             flags=re.IGNORECASE,
         )
 
-        if experience_match is None:
-            approved = False
-            feedback.append(
+        if correspondencia_experiencia is None:
+            aprovado = False
+            motivos_reprovacao.append(
                 f"Formato de experiência inválido: "
-                f"{raw_experience!r}. "
+                f"{experiencia_informada!r}. "
                 "Use, por exemplo, '28 anos' ou '18 meses'.\n"
             )
 
         else:
-            experience_value = float(
-                experience_match.group(1).replace(",", ".")
+            valor_experiencia = float(
+                correspondencia_experiencia.group(1).replace(",", ".")
             )
 
-            unit = (experience_match.group(2) or "anos").lower()
+            # Valores sem unidade são considerados em anos.
+            unidade = (correspondencia_experiencia.group(2) or "anos").lower()
 
-            if unit in ("meses", "mês", "mes"):
-                extracted_experience = experience_value / 12
+            # Converte meses para a mesma unidade do requisito da vaga.
+            if unidade in ("meses", "mês", "mes"):
+                experiencia_anos = valor_experiencia / 12
             else:
-                extracted_experience = experience_value
+                experiencia_anos = valor_experiencia
 
-            if extracted_experience < minimum_experience_years:
-                approved = False
-                feedback.append(
+            if experiencia_anos < experiencia_minima_anos:
+                aprovado = False
+                motivos_reprovacao.append(
                     f"Experiência insuficiente: "
-                    f"{extracted_experience:g} anos. "
+                    f"{experiencia_anos:g} anos. "
                     f"Mínimo exigido: "
-                    f"{minimum_experience_years:g} anos.\n"
+                    f"{experiencia_minima_anos:g} anos.\n"
                 )
 
-    # Part 2 - Budget
+    # Procura a pretensão salarial no formato brasileiro.
 
-    target_budget_label = "pretensão salarial:"
+    rotulo_salario = "pretensão salarial:"
 
-    budget_pattern = (
-        re.escape(target_budget_label)
+    padrao_salario = (
+        re.escape(rotulo_salario)
         + r"\s*(?:r\$|\$)?\s*"
         + r"(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d{2}))?(?![\d.,])"
     )
 
-    budget_match = re.search(budget_pattern, file_content_lower)
+    correspondencia_salario = re.search(padrao_salario, texto_minusculo)
 
-    if budget_match:
-        integer_part = budget_match.group(1).replace(".", "")
-        decimal_part = budget_match.group(2) or "00"
+    if correspondencia_salario:
+        # Remove os pontos de milhar e separa os centavos.
+        parte_inteira = correspondencia_salario.group(1).replace(".", "")
+        centavos = correspondencia_salario.group(2) or "00"
 
-        expected_salary = Decimal(
-            f"{integer_part}.{decimal_part}"
+        # Decimal mantém a precisão dos valores monetários.
+        salario_pretendido = Decimal(
+            f"{parte_inteira}.{centavos}"
         )
-        budget_value = Decimal(str(budget))
+        valor_orcamento = Decimal(str(orcamento_vaga))
 
-        if expected_salary > budget_value:
-            approved = False
-            feedback.append(
-                f"Salary expectations ({expected_salary}) "
-                f"exceed the budget ({budget_value}).\n"
+        if salario_pretendido > valor_orcamento:
+            aprovado = False
+            motivos_reprovacao.append(
+                f"Pretensão salarial ({salario_pretendido}) "
+                f"acima do orçamento ({valor_orcamento}).\n"
             )
     else:
-        approved = False
-        feedback.append(
-            "Salary expectation not found or invalid in the resume.\n"
+        aprovado = False
+        motivos_reprovacao.append(
+            "Pretensão salarial ausente ou em formato inválido no currículo.\n"
         )
 
-    return approved, feedback
+    # A reprovação de um filtro não impede a verificação do outro.
+    return aprovado, motivos_reprovacao

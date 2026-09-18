@@ -1,64 +1,78 @@
-from src.pdf_reader import read_file_content
-from src.deterministic_layer import apply_filters
-from src.generative_layer import candidate_profiler
+"""Controla a execução da triagem e exibe os resultados no terminal."""
+
 from pathlib import Path
 
-def run_resume_pipeline():
+from src.pdf_reader import extrair_texto_pdf
+from src.deterministic_layer import aplicar_filtros
+from src.generative_layer import analisar_curriculo
 
-    print("\n=== RESUME PROFILER ===")
 
-    budget = 35000
-    required_experience = 10
+def executar_triagem():
+    """Lê o currículo, aplica os filtros e mostra a análise simulada."""
 
-    file_path = (
+    print("\n=== TRIAGEM DE CURRÍCULOS ===")
+
+    # Define o salário máximo e a experiência mínima da vaga.
+    orcamento_vaga = 35000
+    experiencia_minima = 10
+
+    # Localiza o PDF a partir da pasta deste arquivo.
+    caminho_arquivo = (
         Path(__file__).resolve().parent
         / "data"
         / "curriculo_candidato.pdf"
     )
 
-    print(f"\nReading file: {file_path}...")
+    print(f"\nLendo arquivo: {caminho_arquivo}...")
 
-    file_content = read_file_content(file_path)
+    texto_curriculo = extrair_texto_pdf(caminho_arquivo)
 
-    print("\nApplying deterministic layer:\n")
-    meets_criteria, feedback = apply_filters(
-        file_content,
-        required_experience,
-        budget
-    )
-
-    if not meets_criteria:
-        print("-> Status: REJECTED by deterministic screening.")
-        print("-> Reason(s) for rejection:")
-        for reason in feedback:
-            print(f"   - {reason}")
-        print("-> Process terminated.")
+    # Um PDF sem texto não deve ser tratado como reprovação do candidato.
+    if not texto_curriculo.strip():
+        print("-> Processo encerrado: PDF indisponível ou sem texto extraível.")
         return
 
-    print("-> Status: PASSED deterministic screening! Proceeding to AI script generation...")
+    print("\nAplicando filtros de experiência e salário:\n")
+    atende_requisitos, motivos_reprovacao = aplicar_filtros(
+        texto_curriculo,
+        experiencia_minima,
+        orcamento_vaga
+    )
 
-    print("\nApplying generative layer:")
+    # Encerra antes da simulação quando algum requisito não é atendido.
+    if not atende_requisitos:
+        print("-> Situação: REPROVADO nos filtros.")
+        print("-> Motivos da reprovação:")
+        for motivo in motivos_reprovacao:
+            print(f"   - {motivo}")
+        print("-> Processo encerrado.")
+        return
+
+    print("-> Situação: APROVADO nos filtros. Iniciando análise simulada...")
+
+    print("\nGerando parecer simulado:")
+    # A análise só é gerada para candidatos aprovados nos dois filtros.
     try:
-        custom_interview_guide, token_report = candidate_profiler(file_content)
+        parecer, relatorio_uso = analisar_curriculo(texto_curriculo)
 
         print("\n" + "=" * 52)
-        print("                  CUSTOM AI GUIDE")
+        print("                  ANÁLISE SIMULADA DO PERFIL")
         print("=" * 52)
-        print(custom_interview_guide)
+        print(parecer)
         
         print("\n" + "=" * 52)
-        print("                TOKEN USAGE REPORT")
+        print("                RELATÓRIO DE USO DE TOKENS")
         print("=" * 52)
-        print(f"• Model Used              :   {token_report['model']}")
-        print(f"• Prompt Tokens           :   {token_report['prompt_tokens']}")
-        print(f"• Completion Tokens       :   {token_report['completion_tokens']}")
-        print(f"• Total Token Usage       :   {token_report['token_total']}")
-        print(f"• Total Operation Cost    :   {token_report['cost']}")
+        print(f"• Modelo de referência    :   {relatorio_uso['modelo']}")
+        print(f"• Tokens de entrada       :   {relatorio_uso['tokens_entrada']}")
+        print(f"• Tokens de saída         :   {relatorio_uso['tokens_saida']}")
+        print(f"• Total de tokens         :   {relatorio_uso['total_tokens']}")
+        print(f"• Custo estimado          :   {relatorio_uso['custo_estimado']}")
         print("=" * 52)
 
-    except Exception as e:
-            print(f"[CRITICAL] Generative layer execution failed: {e}")
+    except Exception as erro:
+        print(f"[ERRO] Falha na análise simulada: {erro}")
 
 
 if __name__ == "__main__":
-    run_resume_pipeline()
+    executar_triagem()

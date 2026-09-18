@@ -1,13 +1,18 @@
+"""Conta os tokens dos textos usando tiktoken, sem acessar uma API de geração."""
+
 import tiktoken
 
 
-def count_tokens(content, model="gpt-4o-mini"):
+def contar_tokens(conteudo, modelo="gpt-4o-mini"):
     """Conta os tokens do texto usando o tokenizador do modelo."""
-    encoder = tiktoken.encoding_for_model(model)
+    # Seleciona a codificação associada ao nome do modelo.
+    codificador = tiktoken.encoding_for_model(modelo)
 
-    tokens = encoder.encode(
-        content,
+    # Trata possíveis marcadores especiais como texto comum do currículo.
+    tokens = codificador.encode(
+        conteudo,
         disallowed_special=(),
     )
 
+    # Falhas são propagadas; não há estimativa por número de caracteres.
     return len(tokens)

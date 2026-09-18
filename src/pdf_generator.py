@@ -1,50 +1,58 @@
+"""Gera o currículo de entrada usado como exemplo no projeto."""
+
 import os
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-def generate_pdf():
+def gerar_curriculo_exemplo():
+    """Cria o currículo de exemplo e sobrescreve o PDF de mesmo nome."""
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Encontra a raiz do projeto a partir da localização deste módulo.
+    pasta_atual = os.path.dirname(os.path.abspath(__file__))
     
-    if os.path.basename(current_dir) == 'src':
-        project_root = os.path.dirname(current_dir)
+    if os.path.basename(pasta_atual) == 'codigo':
+        raiz_projeto = os.path.dirname(pasta_atual)
     else:
-        project_root = current_dir
+        raiz_projeto = pasta_atual
 
-    output_dir = os.path.join(project_root, "data")
-    file_name = "curriculo_candidato.pdf"
+    pasta_saida = os.path.join(raiz_projeto, "dados")
+    nome_arquivo = "curriculo_candidato.pdf"
     
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    # Cria a pasta de dados caso ela ainda não exista.
+    if not os.path.exists(pasta_saida):
+        os.makedirs(pasta_saida)
         
-    file_path = os.path.join(output_dir, file_name)
+    caminho_arquivo = os.path.join(pasta_saida, nome_arquivo)
 
-    c = canvas.Canvas(file_path, pagesize=letter)
-    width, height = letter
+    # Abre um PDF em tamanho carta e define a área de desenho.
+    documento = canvas.Canvas(caminho_arquivo, pagesize=letter)
+    largura, altura = letter
     
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(50, height - 50, "CURRÍCULO PROFISSIONAL")
-    c.setFont("Helvetica", 11)
-    c.drawString(50, height - 70, "-" * 80)
-    c.drawString(50, height - 100, "Nome: Carlos Eduardo Fontes")
+    # Escreve o título e os campos usados pelos filtros.
+    documento.setFont("Helvetica-Bold", 14)
+    documento.drawString(50, altura - 50, "CURRÍCULO PROFISSIONAL")
+    documento.setFont("Helvetica", 11)
+    documento.drawString(50, altura - 70, "-" * 80)
+    documento.drawString(50, altura - 100, "Nome: Carlos Eduardo Fontes")
     
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, height - 140, "Dados Objetivos:")
-    c.setFont("Helvetica", 11)
-    c.drawString(50, height - 160, "Experiência: 28 anos")
-    c.drawString(50, height - 180, "Pretensão salarial: R$ 32.457")
+    documento.setFont("Helvetica-Bold", 11)
+    documento.drawString(50, altura - 140, "Dados Objetivos:")
+    documento.setFont("Helvetica", 11)
+    documento.drawString(50, altura - 160, "Experiência: 28 anos")
+    documento.drawString(50, altura - 180, "Pretensão salarial: R$ 32.457")
     
-    c.drawString(50, height - 210, "-" * 80)
+    documento.drawString(50, altura - 210, "-" * 80)
     
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, height - 240, "Resumo da Trajetória:")
+    documento.setFont("Helvetica-Bold", 11)
+    documento.drawString(50, altura - 240, "Resumo da Trajetória:")
     
-    text_object = c.beginText(50, height - 265)
-    text_object.setFont("Helvetica", 11)
-    text_object.setLeading(15)
+    bloco_texto = documento.beginText(50, altura - 265)
+    bloco_texto.setFont("Helvetica", 11)
+    bloco_texto.setLeading(15)
     
-    narrative = (
+    # Texto fixo de exemplo para exercitar a análise de perfil.
+    resumo_trajetoria = (
         "Busco a consolidação da minha trajetória técnica assumindo a vanguarda de uma\n"
         "iniciativa de alto impacto. Ao longo das últimas décadas, dediquei-me a arquitetar\n"
         "sistemas complexos e, neste momento específico da minha jornada, procuro um projeto\n"
@@ -57,13 +65,15 @@ def generate_pdf():
         "formando parcerias e laços profissionais que perduram até hoje."
     )
     
-    for line in narrative.split('\n'):
-        text_object.textLine(line)
+    # Desenha cada linha do resumo com o espaçamento configurado.
+    for linha in resumo_trajetoria.split('\n'):
+        bloco_texto.textLine(linha)
         
-    c.drawText(text_object)
+    documento.drawText(bloco_texto)
 
-    c.save()
-    print(f"File '{file_name}' successfully saved to '{output_dir}'.")
+    # Finaliza a escrita do arquivo em disco.
+    documento.save()
+    print(f"Arquivo '{nome_arquivo}' salvo em '{pasta_saida}'.")
 
 if __name__ == "__main__":
-    generate_pdf()
+    gerar_curriculo_exemplo()
