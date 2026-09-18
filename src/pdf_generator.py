@@ -11,7 +11,7 @@ def gerar_curriculo_exemplo():
     # Encontra a raiz do projeto a partir da localização deste módulo.
     pasta_atual = os.path.dirname(os.path.abspath(__file__))
     
-    if os.path.basename(pasta_atual) == 'codigo':
+    if os.path.basename(pasta_atual) == 'src':
         raiz_projeto = os.path.dirname(pasta_atual)
     else:
         raiz_projeto = pasta_atual
